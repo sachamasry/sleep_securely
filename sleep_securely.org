@@ -39,7 +39,7 @@ basice /recipes/.
 [private]
 chmod:
 	echo "==> Adding executable flag"
-	chmod +x ./sleep_securely.sh
+	sudo chmod +x ./sleep_securely.sh
 	echo "--> Executable flag set"
 
 # Install script
@@ -53,12 +53,52 @@ Then, we specify the desired actions in the script file.
 
 #+begin_src shell :tangle sleep_securely.sh
 #!/bin/bash
+#+end_src
 
-# Disable Bluetooth
-#blueutil -p 0
+As I bring work to a close in a location I felt comfortable in, and /trusted/, I
+cannot know with certainty where I will be waking the system up again. As the
+wireless capability comes to life, it starts out by scanning for known access
+points, giving away unintended information. In the interests of reducing
+exposure in unknown public settings, let's turn off the wireless network and
+force a positive decision to bring it up manually when desired.
+
+#+begin_src shell :tangle sleep_securely.sh
 
 # Disable Wi-Fi
 networksetup -setairportpower en0 off
+#+end_src
+
+In the same vein, as well as for the pure convenience of not having the laptop
+try to /snatch/ bluetooth connections to headphones and mice during its sleep, I
+want to bring down the bluetooth connection.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Disable Bluetooth
+#blueutil -p 0
+#+end_src
+
+Unmount all external currently mounted volumes. This is needed to unmount any
+SSH file system mounted volumes relying on Tailscale (see below), which is why
+this step /must/ run before Tailscale is taken offline. From a security
+perspective, it is also desirable to unmount any external volumes /especially/
+the encrypted ones, forcing me to manually remount them, reentering any
+encryption keys when needed once again.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Unmount all external volumes
+diskutil list external | grep -E '^\/' | while read -r volume; do
+    diskutil unmount "$volume"
+done
+#+end_src
+
+One known issue with privacy and use of secure VPNs, is that Tailscale, while
+incredibly useful, can result in alternative, unsecured, network routing. Before
+going to sleep, take Tailscale offline; it's easy to take it back online when
+needed again.
+
+#+begin_src shell :tangle sleep_securely.sh
 
 # Disable Tailscale
 /Applications/Tailscale.app/Contents/MacOS/Tailscale down

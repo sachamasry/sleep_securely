@@ -6,7 +6,7 @@
 [private]
 chmod:
 	echo "==> Adding executable flag"
-	chmod +x ./sleep_securely.sh
+	sudo chmod +x ./sleep_securely.sh
 	echo "--> Executable flag set"
 
 # Install script

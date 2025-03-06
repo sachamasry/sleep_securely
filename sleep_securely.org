@@ -39,19 +39,19 @@ basice /recipes/.
 [private]
 chmod:
 	echo "==> Adding executable flag"
-	chmod +x ./output/sleep_securely.sh
+	chmod +x ./sleep_securely.sh
 	echo "--> Executable flag set"
 
 # Install script
 install: chmod
 	echo "==> Installing script"
-	sudo cp ./output/sleep_securely.sh /usr/local/bin/sleep_securely.sh
+	sudo cp ./sleep_securely.sh /usr/local/bin/sleep_securely.sh
 	echo "--> Script successfully installed"
 #+end_src
 
 Then, we specify the desired actions in the script file.
 
-#+begin_src shell :tangle ./output/sleep_securely.sh
+#+begin_src shell :tangle sleep_securely.sh
 #!/bin/bash
 
 # Disable Bluetooth
@@ -62,4 +62,16 @@ networksetup -setairportpower en0 off
 
 # Disable Tailscale
 /Applications/Tailscale.app/Contents/MacOS/Tailscale down
+#+end_src
+
+When closing the lid, literally and figuratively, on a project, there's no way
+of knowing where we'll be when we reawaken the computer. Just imagine the
+embarrassment of opening the lid and a movie or song resuming at full blast in a
+library, or worse, a quiet business meeting! Let's always mute the volume before
+going to sleep, it's safer.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Mute system volume to prevent unpleasant surprises!
+osascript -e "set volume with output muted"
 #+end_src

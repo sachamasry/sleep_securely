@@ -1,0 +1,65 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+options: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+options: email:nil expand-links:t f:t inline:t num:t p:nil pri:nil prop:nil
+#+options: stat:t tags:t tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+title: Sleep Securely
+#+date: <2025-03-06 Thu>
+#+author: Sacha
+#+email: sacha@sachamasry.com
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 30.0.93 (Org mode 9.7.11)
+#+cite_export:
+
+* Synopsis
+
+When a macOS system goes to sleep, it preserves the environment /exactly/ as it
+was when the system sleep event was initiated. This is excellent for most
+people, as it is predictable and comfortable, convenient. Power users have other
+needs beyond this, often wanting alternative conveniences for their /less usual/
+habits, such as muting the system (we don't know what space we'll be in next),
+proactively turning off bluetooth and WiFi (reducing our security
+vulnerability), as well as other conveniences.
+
+This journal is a /literate/ journal describing the process in detail, with the
+intention that it is /tangled/ into the target file.
+
+* Basic requirements
+
+To simplify script handling and installation, a `justfile` will be created with
+basice /recipes/.
+
+#+begin_src makefile :tangle ./justfile
+[private]
+@help:
+	just --list
+
+# Add shell script executable status
+[private]
+chmod:
+	echo "==> Adding executable flag"
+	chmod +x ./output/sleep_securely.sh
+	echo "--> Executable flag set"
+
+# Install script
+install: chmod
+	echo "==> Installing script"
+	sudo cp ./output/sleep_securely.sh /usr/local/bin/sleep_securely.sh
+	echo "--> Script successfully installed"
+#+end_src
+
+Then, we specify the desired actions in the script file.
+
+#+begin_src shell :tangle ./output/sleep_securely.sh
+#!/bin/bash
+
+# Disable Bluetooth
+#blueutil -p 0
+
+# Disable Wi-Fi
+networksetup -setairportpower en0 off
+
+# Disable Tailscale
+/Applications/Tailscale.app/Contents/MacOS/Tailscale down
+#+end_src

@@ -38,21 +38,47 @@ basice /recipes/.
 # Add shell script executable status
 [private]
 chmod:
-	echo "==> Adding executable flag"
-	sudo chmod +x ./sleep_securely.sh
-	echo "--> Executable flag set"
+	@echo "==> Setting executable flag"
+	chmod +x ./sleep_securely.sh
+	@echo "--> Executable flag successfully set\n"
 
 # Install script
 install: chmod
-	echo "==> Installing script"
-	sudo cp ./sleep_securely.sh /usr/local/bin/sleep_securely.sh
-	echo "--> Script successfully installed"
+	@echo "==> Installing script"
+	cp ./sleep_securely.sh ~/bin/sleep_securely.sh
+	@echo "--> Script successfully installed\n"
 #+end_src
 
 Then, we specify the desired actions in the script file.
 
 #+begin_src shell :tangle sleep_securely.sh
 #!/bin/bash
+#+end_src
+
+Arguably the most valuable and confidential resource is the password library,
+hosted on the excellent KeePassXC application. As good as it is, this
+application still has to store the key somewhere in memory in exchange for
+giving us quick and convenient access to the password database. Let's ensure
+that this is the very first—and most important—action taken of all the security
+steps. Even if all aspects of this script fail, this one is the most valuable
+and impactful: kill KeePassXC, ejecting it from memory.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Quit KeePassXC upon sleep
+/usr/bin/killall KeePassXC
+#+end_src
+
+Prior to more destructive changes, let us also initiate a controlled quitting of
+Parallels Desktop. This application is used to run any number of servers for
+isolation /and/ security. Its networking is able to interfere with the
+establishment of wifi connections, particularly some behind /captive/ wifi
+setups, found in many coffee shops and locations advertising /free/ wireless.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Tell Parallels Desktop application to quit gently
+osascript -e 'tell application "Parallels Desktop" to quit'
 #+end_src
 
 As I bring work to a close in a location I felt comfortable in, and /trusted/, I
@@ -75,7 +101,7 @@ want to bring down the bluetooth connection.
 #+begin_src shell :tangle sleep_securely.sh
 
 # Disable Bluetooth
-#blueutil -p 0
+/opt/homebrew/bin/blueutil -p 0
 #+end_src
 
 Unmount all external currently mounted volumes. This is needed to unmount any

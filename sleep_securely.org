@@ -77,8 +77,10 @@ setups, found in many coffee shops and locations advertising /free/ wireless.
 
 #+begin_src shell :tangle sleep_securely.sh
 
-# Tell Parallels Desktop application to quit gently
-osascript -e 'tell application "Parallels Desktop" to quit'
+# Tell Parallels Desktop application to quit gently, if it is already open
+if pgrep -q "Application Name"; then
+    osascript -e 'tell application "Parallels Desktop" to quit'
+fi
 #+end_src
 
 As I bring work to a close in a location I felt comfortable in, and /trusted/, I
@@ -127,7 +129,9 @@ needed again.
 #+begin_src shell :tangle sleep_securely.sh
 
 # Disable Tailscale
-/Applications/Tailscale.app/Contents/MacOS/Tailscale down
+if [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]; then
+    "/Applications/Tailscale.app/Contents/MacOS/Tailscale" down
+fi
 #+end_src
 
 When closing the lid, literally and figuratively, on a project, there's no way
@@ -140,4 +144,36 @@ going to sleep, it's safer.
 
 # Mute system volume to prevent unpleasant surprises!
 osascript -e "set volume with output muted"
+#+end_src
+
+** Quit all sensitive applications
+
+Given that it's impossible to know who will next /open/, or wake up, your
+computer, it's safest to proactively /kill/ all communications applications
+with confidential information.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Close all email applications (MUAs)
+pkill -x "Proton Mail"
+pkill -x "Thunderbird"
+pkill -x "thunderbird"
+pkill -x "Mail"
+
+# Close sensitive communication applications
+pkill -x "Discord"
+pkill -x "FaceTime"
+pkill -x "Messages"
+pkill -x "Microsoft Teams"
+pkill -x "Signal"
+pkill -x "Slack"
+pkill -x "Telegram"
+pkill -x "Trello"
+pkill -x "Viber"
+pkill -x "WhatsApp"
+
+pkill -x "Zoom"
+pkill -x "Zoom.us"
+pkill -x "zoom"
+pkill -x "zoom.us"
 #+end_src

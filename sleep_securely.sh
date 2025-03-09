@@ -4,7 +4,7 @@
 /usr/bin/killall KeePassXC
 
 # Tell Parallels Desktop application to quit gently, if it is already open
-if pgrep -q "Application Name"; then
+if pgrep -q prl_client; then
     osascript -e 'tell application "Parallels Desktop" to quit'
 fi
 

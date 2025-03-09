@@ -78,7 +78,7 @@ setups, found in many coffee shops and locations advertising /free/ wireless.
 #+begin_src shell :tangle sleep_securely.sh
 
 # Tell Parallels Desktop application to quit gently, if it is already open
-if pgrep -q "Application Name"; then
+if pgrep -q prl_client; then
     osascript -e 'tell application "Parallels Desktop" to quit'
 fi
 #+end_src

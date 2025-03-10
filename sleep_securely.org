@@ -177,3 +177,22 @@ pkill -x "Zoom.us"
 pkill -x "zoom"
 pkill -x "zoom.us"
 #+end_src
+
+** Clear the clipboard
+
+The clipboard is a wonderful thing, it's there to help us move blocks of
+information around, but it is liable to store many things we don't want to
+share: passwords copied from a password manager, confidential text from an email
+or private message, sensitive information personally identifying you. From a
+convenience standpoint, we rely on this functionality to paste /recently/ copied
+text; once the system has been suspended and resumed, there is no longer a
+reasonable context around what was recent.
+
+Objectively the best thing to do is to clear the clipboard to prevent any data
+leakage.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Clear clipboard contents
+/usr/bin/pbcopy < /dev/null
+#+end_src

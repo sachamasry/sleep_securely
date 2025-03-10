@@ -49,3 +49,6 @@ pkill -x "Zoom"
 pkill -x "Zoom.us"
 pkill -x "zoom"
 pkill -x "zoom.us"
+
+# Clear clipboard contents
+/usr/bin/pbcopy < /dev/null

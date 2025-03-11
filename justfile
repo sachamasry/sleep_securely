@@ -6,11 +6,11 @@
 [private]
 chmod:
 	@echo "==> Setting executable flag"
-	chmod +x ./sleep_securely.sh
+	chmod +x ./scripts/sleep_securely.sh
 	@echo "--> Executable flag successfully set\n"
 
 # Install script
 install: chmod
 	@echo "==> Installing script"
-	cp ./sleep_securely.sh ~/bin/sleep_securely.sh
+	cp ./scripts/sleep_securely.sh ~/bin/sleep_securely.sh
 	@echo "--> Script successfully installed\n"

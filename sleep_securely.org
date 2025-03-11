@@ -3,14 +3,25 @@
 #+options: email:nil expand-links:t f:t inline:t num:t p:nil pri:nil prop:nil
 #+options: stat:t tags:t tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
 #+title: Sleep Securely
-#+date: <2025-03-06 Thu>
 #+author: Sacha
+#+latex_class: devilray-org-article
+#+latex_class_options:
+#+latex_header:
+#+latex_header_extra:
+#+description:
+#+keywords:
+#+subtitle:
+#+latex_footnote_command: \footnote{%s%s}
+#+latex_engraved_theme:
+#+latex_compiler: pdflatex
+#+date: \today
 #+email: sacha@sachamasry.com
 #+language: en
 #+select_tags: export
 #+exclude_tags: noexport
 #+creator: Emacs 30.0.93 (Org mode 9.7.11)
 #+cite_export:
+#+EXPORT_FILE_NAME: Sleep-Securely
 
 * Synopsis
 
@@ -39,19 +50,24 @@ basice /recipes/.
 [private]
 chmod:
 	@echo "==> Setting executable flag"
-	chmod +x ./sleep_securely.sh
+	chmod +x ./scripts/sleep_securely.sh
 	@echo "--> Executable flag successfully set\n"
 
 # Install script
 install: chmod
 	@echo "==> Installing script"
-	cp ./sleep_securely.sh ~/bin/sleep_securely.sh
+	cp ./scripts/sleep_securely.sh ~/bin/sleep_securely.sh
 	@echo "--> Script successfully installed\n"
 #+end_src
 
-Then, we specify the desired actions in the script file.
+* Actions to take upon sleep
+:PROPERTIES:
+:header-args: :tangle scripts/sleep_securely.sh :mkdirp yes
+:END:
 
-#+begin_src shell :tangle sleep_securely.sh
+Our target script file is a shell script, so we need to specify the script header first.
+
+#+begin_src shell
 #!/bin/bash
 #+end_src
 
@@ -63,7 +79,7 @@ that this is the very first—and most important—action taken of all the secur
 steps. Even if all aspects of this script fail, this one is the most valuable
 and impactful: kill KeePassXC, ejecting it from memory.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Quit KeePassXC upon sleep
 /usr/bin/killall KeePassXC
@@ -75,7 +91,7 @@ isolation /and/ security. Its networking is able to interfere with the
 establishment of wifi connections, particularly some behind /captive/ wifi
 setups, found in many coffee shops and locations advertising /free/ wireless.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Tell Parallels Desktop application to quit gently, if it is already open
 if pgrep -q prl_client; then
@@ -90,7 +106,7 @@ points, giving away unintended information. In the interests of reducing
 exposure in unknown public settings, let's turn off the wireless network and
 force a positive decision to bring it up manually when desired.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Disable Wi-Fi
 networksetup -setairportpower en0 off
@@ -100,7 +116,7 @@ In the same vein, as well as for the pure convenience of not having the laptop
 try to /snatch/ bluetooth connections to headphones and mice during its sleep, I
 want to bring down the bluetooth connection.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Disable Bluetooth
 /opt/homebrew/bin/blueutil -p 0
@@ -113,7 +129,7 @@ perspective, it is also desirable to unmount any external volumes /especially/
 the encrypted ones, forcing me to manually remount them, reentering any
 encryption keys when needed once again.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Unmount all external volumes
 diskutil list external | grep -E '^\/' | while read -r volume; do
@@ -126,7 +142,7 @@ incredibly useful, can result in alternative, unsecured, network routing. Before
 going to sleep, take Tailscale offline; it's easy to take it back online when
 needed again.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Disable Tailscale
 if [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]; then
@@ -140,7 +156,7 @@ embarrassment of opening the lid and a movie or song resuming at full blast in a
 library, or worse, a quiet business meeting! Let's always mute the volume before
 going to sleep, it's safer.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Mute system volume to prevent unpleasant surprises!
 osascript -e "set volume with output muted"
@@ -152,7 +168,7 @@ Given that it's impossible to know who will next /open/, or wake up, your
 computer, it's safest to proactively /kill/ all communications applications
 with confidential information.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shel 
 
 # Close all email applications (MUAs)
 pkill -x "Proton Mail"
@@ -191,7 +207,7 @@ reasonable context around what was recent.
 Objectively the best thing to do is to clear the clipboard to prevent any data
 leakage.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Clear clipboard contents
 /usr/bin/pbcopy < /dev/null
@@ -213,7 +229,7 @@ This means it can’t expose any secret information or establish unauthorized SS
 sessions on other devices. It's straightforward to delete the key using `ssh-add
 -D`.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Clear SSH agent identities
 ssh-add -D
@@ -223,7 +239,7 @@ Rather than stop there, why even keep `ssh-agent` running? Let's kill it,
 ensuring that not only keys but also any other information it may be holding in
 memory is released and unusable.
 
-#+begin_src shell :tangle sleep_securely.sh
+#+begin_src shell
 
 # Securely wipe SSH agent
 killall ssh-agent

@@ -196,3 +196,35 @@ leakage.
 # Clear clipboard contents
 /usr/bin/pbcopy < /dev/null
 #+end_src
+
+** SSH security
+
+SSH is an invaluable system administration tool for logging on to remote
+machines securely. As this is an important function in maintenance, development
+and other administration tasks, an agent is provided for convenience,
+`ssh-agent`, to help track and load users' identity keys.
+
+Once keys are loaded, the agent provides user convenience by keeping private
+keys loaded, so that the passphrase doesn't need to be entered repeatedly.
+Removing keys from the agent is a good security practice as anyone walking up to
+the machine after waking from sleep cannot simply log in to a remote machine;
+once the key is deleted from the agent, `ssh-agent` won’t be able to use it.
+This means it can’t expose any secret information or establish unauthorized SSH
+sessions on other devices. It's straightforward to delete the key using `ssh-add
+-D`.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Clear SSH agent identities
+ssh-add -D
+#+end_src
+
+Rather than stop there, why even keep `ssh-agent` running? Let's kill it,
+ensuring that not only keys but also any other information it may be holding in
+memory is released and unusable.
+
+#+begin_src shell :tangle sleep_securely.sh
+
+# Securely wipe SSH agent
+killall ssh-agent
+#+end_src

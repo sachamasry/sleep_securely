@@ -52,3 +52,9 @@ pkill -x "zoom.us"
 
 # Clear clipboard contents
 /usr/bin/pbcopy < /dev/null
+
+# Clear SSH agent identities
+ssh-add -D
+
+# Securely wipe SSH agent
+killall ssh-agent

@@ -39,6 +39,7 @@ pkill -x "FaceTime"
 pkill -x "Messages"
 pkill -x "Microsoft Teams"
 pkill -x "Signal"
+pkill -x "Skype"
 pkill -x "Slack"
 pkill -x "Telegram"
 pkill -x "Trello"
@@ -50,6 +51,8 @@ pkill -x "Zoom.us"
 pkill -x "zoom"
 pkill -x "zoom.us"
 
+pkill -x "Authy Desktop"
+
 # Clear clipboard contents
 /usr/bin/pbcopy < /dev/null
 
@@ -58,3 +61,8 @@ ssh-add -D
 
 # Securely wipe SSH agent
 killall ssh-agent
+
+# Download trace elimination
+sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* "DELETE FROM LSQuarantineEvent;"
+
+DELETE FROM LSQuarantineEvent;

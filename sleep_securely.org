@@ -38,7 +38,7 @@ intention that it is /tangled/ into the target file.
 
 * Basic requirements
 
-To simplify script handling and installation, a `justfile` will be created with
+To simplify script handling and installation, a ~justfile~ will be created with
 basice /recipes/.
 
 #+begin_src makefile :tangle ./justfile
@@ -168,7 +168,7 @@ Given that it's impossible to know who will next /open/, or wake up, your
 computer, it's safest to proactively /kill/ all communications applications
 with confidential information.
 
-#+begin_src shel 
+#+begin_src shell
 
 # Close all email applications (MUAs)
 pkill -x "Proton Mail"
@@ -182,6 +182,7 @@ pkill -x "FaceTime"
 pkill -x "Messages"
 pkill -x "Microsoft Teams"
 pkill -x "Signal"
+pkill -x "Skype"
 pkill -x "Slack"
 pkill -x "Telegram"
 pkill -x "Trello"
@@ -192,6 +193,8 @@ pkill -x "Zoom"
 pkill -x "Zoom.us"
 pkill -x "zoom"
 pkill -x "zoom.us"
+
+pkill -x "Authy Desktop"
 #+end_src
 
 ** Clear the clipboard
@@ -218,16 +221,16 @@ leakage.
 SSH is an invaluable system administration tool for logging on to remote
 machines securely. As this is an important function in maintenance, development
 and other administration tasks, an agent is provided for convenience,
-`ssh-agent`, to help track and load users' identity keys.
+~ssh-agent~, to help track and load users' identity keys.
 
 Once keys are loaded, the agent provides user convenience by keeping private
 keys loaded, so that the passphrase doesn't need to be entered repeatedly.
 Removing keys from the agent is a good security practice as anyone walking up to
 the machine after waking from sleep cannot simply log in to a remote machine;
-once the key is deleted from the agent, `ssh-agent` won’t be able to use it.
+once the key is deleted from the agent, ~ssh-agent~ won’t be able to use it.
 This means it can’t expose any secret information or establish unauthorized SSH
-sessions on other devices. It's straightforward to delete the key using `ssh-add
--D`.
+sessions on other devices. It's straightforward to delete the key using ~ssh-add
+-D~.
 
 #+begin_src shell
 
@@ -235,7 +238,7 @@ sessions on other devices. It's straightforward to delete the key using `ssh-add
 ssh-add -D
 #+end_src
 
-Rather than stop there, why even keep `ssh-agent` running? Let's kill it,
+Rather than stop there, why even keep ~ssh-agent~ running? Let's kill it,
 ensuring that not only keys but also any other information it may be holding in
 memory is released and unusable.
 
@@ -243,4 +246,53 @@ memory is released and unusable.
 
 # Securely wipe SSH agent
 killall ssh-agent
+#+end_src
+
+** Browsing privacy
+
+macOS keeps a record of every file downloaded from the internet. These records
+include download dates, sources, and applications used. Clearing the responsible
+SQLite database removes this download history, evidence of downloaded files that
+might be sensitive, making it harder for malicious actors to see what has been
+downloaded, reducing leakage of internet activity.
+
+The way it works is that when you download files, macOS adds a quarantine
+attribute, triggering "This file was downloaded from the internet" warnings. The
+database keeps metadata about these downloads
+
+If you download a document from a secure source before sleep, this command
+ensures that when your system wakes up, there's no record of that download in
+the system's databases.
+
+This action isn't destructive, only removing metadata about downloaded files,
+not the files themselves. The system will continue to function normally, and
+future downloads will simply start creating new entries in the database. This is
+an excellent privacy-enhancing measure that leaves no obvious trace of your
+download activity between sleep sessions, while having zero impact on system
+functionality.
+
+Below is the command that will clear this database on close:
+
+#+begin_src shell
+
+# Download trace elimination
+sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* "DELETE FROM LSQuarantineEvent;"
+#+end_src
+
+*** How does it work?
+
+This is the path to the macOS quarantine database:
+
+#+begin_example
+~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV*
+#+end_example
+
+The database is located in the user's ~Library/Preferences~ folder, and the ~*~
+is a wildcard matching any version number (e.g., QuarantineEventsV2,
+QuarantineEventsV3).
+
+The following SQL command removes all records from the ~LSQuarantineEvent~ table:
+
+#+begin_src sql
+DELETE FROM LSQuarantineEvent;
 #+end_src

@@ -71,6 +71,22 @@ Our target script file is a shell script, so we need to specify the script heade
 #!/bin/bash
 #+end_src
 
+Now, we'll incrementally add to the functionality of that script, through
+addressing a range of security and privacy-enhancing categories, one at a time.
+
+** Immediately secure the most important aspects
+
+As macOS, or rather `sleepwatcher`, limits how long a sleep command (or our
+entire script) may be allowed to run
+
+#+begin_quote
+sleepcommand must not take longer than 15 seconds because after this timeout the
+sleep mode is forced by the system
+#+end_quote
+
+then it's important to ensure that critical tasks are carried out immediately,
+so they wouldn't be /cut off/ by the daemon.
+
 Arguably the most valuable and confidential resource is the password library,
 hosted on the excellent KeePassXC application. As good as it is, this
 application still has to store the key somewhere in memory in exchange for
@@ -99,9 +115,14 @@ if pgrep -q prl_client; then
 fi
 #+end_src
 
+
+** Disable network services
+
+*** Disable wireless networking (Wi-Fi)
+
 As I bring work to a close in a location I felt comfortable in, and /trusted/, I
 cannot know with certainty where I will be waking the system up again. As the
-wireless capability comes to life, it starts out by scanning for known access
+wireless radio comes back to life, it starts out by scanning for known access
 points, giving away unintended information. In the interests of reducing
 exposure in unknown public settings, let's turn off the wireless network and
 force a positive decision to bring it up manually when desired.
@@ -112,6 +133,8 @@ force a positive decision to bring it up manually when desired.
 networksetup -setairportpower en0 off
 #+end_src
 
+*** Disable bluetooth connectivity
+
 In the same vein, as well as for the pure convenience of not having the laptop
 try to /snatch/ bluetooth connections to headphones and mice during its sleep, I
 want to bring down the bluetooth connection.
@@ -121,6 +144,39 @@ want to bring down the bluetooth connection.
 # Disable Bluetooth
 /opt/homebrew/bin/blueutil -p 0
 #+end_src
+
+*** Disable AirDrop connectivity
+
+Another service that can expose unnecessary information to those in its
+proximity is AirDrop. AirDrop is a very useful service for easy sharing of files
+and information with trusted people, but most people /forget/ to turn it off
+after use, and almost everybody forgets to reduce its permission from allowing
+connection attempts from 'Everyone', back down to the reduced 'Contacts Only'.
+
+In the following block, we will first reduce the permission to accept attempts
+from contacts, followed by disabling the AirDrop service.
+
+#+begin_src shell
+
+# Lower connection permissions to 'Contacts Only'
+defaults write com.apple.sharingd DiscoverableMode -string "Contacts Only"
+
+# Disable AirDrop discoverability
+defaults write com.apple.sharingd DiscoverableMode -string "Off"
+
+# Restart the sharingd service for the above changes to take effect
+killall sharingd
+#+end_src
+
+As a side-note, for potential future improvement, AirDrop relies on a dedicated
+interface, `awdl0` or /Apple Wireless Direct Link (AWDL)/, which is more secure
+than merely disabling the service. This can be done at sleep by running the
+following command: ~sudo ifconfig awdl0 down~, followed by re-enabling it on
+wake: ~sudo ifconfig awdl0 up~. Unfortunately, this /must/ be run with
+administrative privileges, opening the script up to serious vulnerabilities,
+which I /do not/ want to do here!
+
+*** Unmount all externally mounted volumes
 
 Unmount all external currently mounted volumes. This is needed to unmount any
 SSH file system mounted volumes relying on Tailscale (see below), which is why
@@ -142,6 +198,8 @@ incredibly useful, can result in alternative, unsecured, network routing. Before
 going to sleep, take Tailscale offline; it's easy to take it back online when
 needed again.
 
+*** Disable the Tailscale VPN
+
 #+begin_src shell
 
 # Disable Tailscale
@@ -149,6 +207,8 @@ if [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]; then
     "/Applications/Tailscale.app/Contents/MacOS/Tailscale" down
 fi
 #+end_src
+
+*** Mute system volume
 
 When closing the lid, literally and figuratively, on a project, there's no way
 of knowing where we'll be when we reawaken the computer. Just imagine the
@@ -197,7 +257,7 @@ pkill -x "zoom.us"
 pkill -x "Authy Desktop"
 #+end_src
 
-** Clear the clipboard
+** Clearing the clipboard
 
 The clipboard is a wonderful thing, it's there to help us move blocks of
 information around, but it is liable to store many things we don't want to

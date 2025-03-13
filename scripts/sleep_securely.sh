@@ -14,6 +14,15 @@ networksetup -setairportpower en0 off
 # Disable Bluetooth
 /opt/homebrew/bin/blueutil -p 0
 
+# Lower connection permissions to 'Contacts Only'
+defaults write com.apple.sharingd DiscoverableMode -string "Contacts Only"
+
+# Disable AirDrop discoverability
+defaults write com.apple.sharingd DiscoverableMode -string "Off"
+
+# Restart the sharingd service for the above changes to take effect
+killall sharingd
+
 # Unmount all external volumes
 diskutil list external | grep -E '^\/' | while read -r volume; do
     diskutil unmount "$volume"

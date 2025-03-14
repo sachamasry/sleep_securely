@@ -308,7 +308,9 @@ memory is released and unusable.
 killall ssh-agent
 #+end_src
 
-** Browsing privacy
+** Privacy
+
+*** Browsing privacy
 
 macOS keeps a record of every file downloaded from the internet. These records
 include download dates, sources, and applications used. Clearing the responsible
@@ -339,7 +341,7 @@ Below is the command that will clear this database on close:
 sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* "DELETE FROM LSQuarantineEvent;"
 #+end_src
 
-*** How does it work?
+**** How does it work?
 
 This is the path to the macOS quarantine database:
 
@@ -355,4 +357,32 @@ The following SQL command removes all records from the ~LSQuarantineEvent~ table
 
 #+begin_src sql
 DELETE FROM LSQuarantineEvent;
+#+end_src
+
+
+*** Finder metadata and usage trails
+
+When navigating folders, macOS will creates ~.DS_Store~ files as needed based on
+the current view. ~.DS_Store~ files are hidden files created by Finder storing
+custom attributes of a folder, such as: icon positions, view settings (list,
+grid, etc.), folder background images, and sidebar width. These files contain
+metadata about how you organize your files, can reveal folder structure
+information and may expose browsing habits and organizational patterns.
+
+Deleting these files before sleep removes metadata that could be leveraged by
+forensic analysis, is particularly important for external drives and folders
+shared with others, preventing information leakage about your file system
+organization. Deleting them removes this potential source of information leakage.
+
+You might notice folder views reset to default appearance, but no actual data is
+lost.
+
+It's an elegant way to reduce your digital footprint without affecting system
+functionality, essentially resetting the "fingerprints" left by your Finder
+activity.
+
+#+begin_src shell
+
+# Traverse the user's home directory, searching for, and deleting all `.DS_Store` files
+find ~/ -type f -name ".DS_Store" -delete
 #+end_src

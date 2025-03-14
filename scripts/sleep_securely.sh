@@ -75,3 +75,6 @@ killall ssh-agent
 sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* "DELETE FROM LSQuarantineEvent;"
 
 DELETE FROM LSQuarantineEvent;
+
+# Traverse the user's home directory, searching for, and deleting all `.DS_Store` files
+find ~/ -type f -name ".DS_Store" -delete

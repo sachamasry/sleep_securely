@@ -74,7 +74,7 @@ Our target script file is a shell script, so we need to specify the script heade
 Now, we'll incrementally add to the functionality of that script, through
 addressing a range of security and privacy-enhancing categories, one at a time.
 
-** Immediately secure the most important aspects
+** Immediately implement security measures
 
 As macOS, or rather `sleepwatcher`, limits how long a sleep command (or our
 entire script) may be allowed to run
@@ -86,6 +86,8 @@ sleep mode is forced by the system
 
 then it's important to ensure that critical tasks are carried out immediately,
 so they wouldn't be /cut off/ by the daemon.
+
+*** Quit KeePassXC
 
 Arguably the most valuable and confidential resource is the password library,
 hosted on the excellent KeePassXC application. As good as it is, this
@@ -101,6 +103,8 @@ and impactful: kill KeePassXC, ejecting it from memory.
 /usr/bin/killall KeePassXC
 #+end_src
 
+*** Quit Parallels Desktop
+
 Prior to more destructive changes, let us also initiate a controlled quitting of
 Parallels Desktop. This application is used to run any number of servers for
 isolation /and/ security. Its networking is able to interfere with the
@@ -115,6 +119,53 @@ if pgrep -q prl_client; then
 fi
 #+end_src
 
+*** Restrict access to Keychain
+
+For years, macOS has implemented its own internal /password vault/, Keychain.
+When a user logs into macOS, the Keychain adds convenience by /keeping/ the
+password in memory, so that applications needing access to services can
+transparently obtain the password(s) they need, which is arguably a security
+vulnerability.
+
+Login Keychain is the primary password vault for macOS, storing passwords for:
+
++ Websites (via Safari)
++ Email accounts
++ Wi.Fi networks
++ Secure notes
++ App-specific passwords
++ SSH keys and certificates
+
+The security enhancement that will be had by locking the keychain---at a cost to
+some added inconveience---is the prevention unauthorised access to your stored
+credentials, asking for your password to unlock the keychain again when needed.
+This create a protection layer if someone accesses the computer while sleeping.
+
+When locked, applications can't silently access stored credentials; the next
+time an application needs a password, macOS will prompt for your login password.
+Applications can't automatically authenticate to services without your manual
+intervention. If your computer is accessed while sleeping---e.g. through an
+/evil maid/ attack---the attacker can't use stored passwords, preventing
+unauthorised access to accounts, even if physical access is gained. Applications 
+can no longer continue to use credentials in the background.
+
+The following command provides a crucial layer of protection by requiring
+re-authentication after sleep. It is one of the most effective security measures
+in the script, creating a "clean break" in credential access, preventing
+automated or background access to accounts, forcing manual re-authentication for
+sensitive operations
+
+This is particularly valuable if your computer might be accessed by others while
+in sleep mode, as it prevents the use of stored credentials without your
+knowledge or permission. When you wake your computer, you'll need to enter your
+password the first time an application tries to access the keychain, which is a
+small inconvenience for a significant security benefit.
+
+#+begin_src shell
+
+# Temporary keychain access restrictions
+security lock-keychain ~/Library/Keychains/login.keychain
+#+end_src
 
 ** Disable network services
 

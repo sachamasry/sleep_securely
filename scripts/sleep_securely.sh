@@ -8,6 +8,9 @@ if pgrep -q prl_client; then
     osascript -e 'tell application "Parallels Desktop" to quit'
 fi
 
+# Temporary keychain access restrictions
+security lock-keychain ~/Library/Keychains/login.keychain
+
 # Disable Wi-Fi
 networksetup -setairportpower en0 off
 

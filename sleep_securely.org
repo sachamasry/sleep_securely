@@ -273,7 +273,7 @@ going to sleep, it's safer.
 osascript -e "set volume with output muted"
 #+end_src
 
-** Quit all sensitive applications
+** Close all sensitive applications
 
 Given that it's impossible to know who will next /open/, or wake up, your
 computer, it's safest to proactively /kill/ all communications applications
@@ -285,7 +285,6 @@ with confidential information.
 pkill -x "Proton Mail"
 pkill -x "Thunderbird"
 pkill -x "thunderbird"
-pkill -x "Mail"
 
 # Close sensitive communication applications
 pkill -x "Discord"
@@ -436,4 +435,60 @@ activity.
 
 # Traverse the user's home directory, searching for, and deleting all `.DS_Store` files
 find ~/ -type f -name ".DS_Store" -delete
+#+end_src
+
+** Sanitise application memory
+
+The /Application memory sanitisation/ section is a sophisticated security
+measure designed to clean up potentially sensitive data from your computer's
+memory, held by the kind of application that can possess sensitive data, such as
+web browsers. We aim to gracefully close specific applications and clear their
+data from memory, preventing potential memory scraping attacks or information
+leakage.
+
+When applications of this type run, they store sensitive data in memory. This
+can include login credentials, session cookies, browsing history, email
+contents, form data, cached documents, and more.
+
+This attack mitigation action prevents memory scraping attacks, reduces the
+attack surface for cold boot attacks, limits the effectiveness of memory
+forensics, and generally releases memory, reducing memory consumption ballooning
+that's so prevalent with web browsers.
+
+Why these applications? Browsers (Safari, Chrome, Firefox) store web credentials
+and session data, mail applications contain email content and potentially
+sensitive attachments, typically caching a significant amount of user data in
+memory.
+
+*** Technical security context
+
+System memory retains data even after applications close. By gracefully closing
+apps, the system allows them to clear sensitive caches while closing themselves,
+and removing themselves from memory. The memory will eventually be overwritten
+by other processes in the future.
+
+This is a non-destructive operation. By gracefully closing applications, it
+allows them to save their state properly. When you wake your computer, you'll
+need to reopen these applications, but they'll typically restore your previous
+sessions. AppleScript is used instead of ~kill~ commands, relying on
+AppleScript's "quit" command rather than forcefully terminating processes
+because it allows applications to clean up their own memory, it prevents
+potential data corruption, while properly saving application state for later
+reopening.
+
+*** Advanced considerations
+
+In a more comprehensive security setup, this could be followed by a memory
+compaction operation (like the ~sudo purge~ command) to further reduce the
+persistence of sensitive data in RAM. This technique is particularly valuable
+when combined with disk encryption, as it helps ensure that even if someone has
+physical access to your sleeping computer, they can't easily extract sensitive
+information from memory.
+
+#+begin_src shell
+
+# Application memory sanitization
+for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "Firefox" "Firefox Nightly" "Mail"; do
+    osascript -e "tell application \"$app\" to if it is running then quit" 2>/dev/null
+done
 #+end_src

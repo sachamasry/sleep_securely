@@ -43,7 +43,6 @@ osascript -e "set volume with output muted"
 pkill -x "Proton Mail"
 pkill -x "Thunderbird"
 pkill -x "thunderbird"
-pkill -x "Mail"
 
 # Close sensitive communication applications
 pkill -x "Discord"
@@ -81,3 +80,8 @@ DELETE FROM LSQuarantineEvent;
 
 # Traverse the user's home directory, searching for, and deleting all `.DS_Store` files
 find ~/ -type f -name ".DS_Store" -delete
+
+# Application memory sanitization
+for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "Firefox" "Firefox Nightly" "Mail"; do
+    osascript -e "tell application \"$app\" to if it is running then quit" 2>/dev/null
+done

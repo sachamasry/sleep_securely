@@ -488,7 +488,7 @@ information from memory.
 #+begin_src shell
 
 # Application memory sanitization
-for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT"; do
+for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT" "dbeaver"; do
     if pgrep -q $app; then
         osascript -e "tell application \"$app\" to quit" 2>/dev/null
     fi

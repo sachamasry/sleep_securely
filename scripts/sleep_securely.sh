@@ -82,8 +82,11 @@ DELETE FROM LSQuarantineEvent;
 find ~/ -type f -name ".DS_Store" -delete
 
 # Application memory sanitization
-for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT" "dbeaver"; do
+for app in "Safari" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT" "dbeaver"; do
     if pgrep -q $app; then
         osascript -e "tell application \"$app\" to quit" 2>/dev/null
     fi
 done
+
+# Send a kill command to Arc browser
+pkill -9 Arc

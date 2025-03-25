@@ -488,9 +488,20 @@ information from memory.
 #+begin_src shell
 
 # Application memory sanitization
-for app in "Safari" "Arc" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT" "dbeaver"; do
+for app in "Safari" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "Mail" "zotero" "Claude" "ChatGPT" "dbeaver"; do
     if pgrep -q $app; then
         osascript -e "tell application \"$app\" to quit" 2>/dev/null
     fi
 done
 #+end_src
+
+Arc browser misbehaves following attempts to quit it in the above way, so it
+should be quit more abruptly, using the non-ignorable 'kill' command:  ~pkill
+-9~, or "KILL (non-catchable, non-ignorable kill)".
+
+#+begin_src shell
+
+# Send a kill command to Arc browser
+pkill -9 Arc
+#+end_src
+

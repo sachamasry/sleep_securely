@@ -88,5 +88,8 @@ for app in "Safari" "Iridium" "Chrome" "Chromium" "firefox" "Firefox Nightly" "M
     fi
 done
 
+# Kill Firefox Nightly
+pgrep "firefox" | xargs --no-run-if-empty ps | grep -e 'Firefox Nightly' | cut -w -f1 | xargs pkill -9;
+
 # Send a kill command to Arc browser
 pkill -9 Arc

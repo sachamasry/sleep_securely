@@ -502,7 +502,7 @@ care of this by killing it in a more targeted way.
 #+begin_src shell
 
 # Kill Firefox Nightly
-pgrep "firefox" | xargs --no-run-if-empty ps | grep -e 'Firefox Nightly' | cut -w -f1 | xargs pkill -9;
+pgrep "firefox" | xargs --no-run-if-empty ps | grep -e 'Firefox Nightly' | cut -w -f1 | xargs kill -9;
 #+end_src
 
 Arc browser misbehaves following attempts to quit it in the above way, so it
@@ -515,3 +515,13 @@ should be quit more abruptly, using the non-ignorable 'kill' command:  ~pkill
 pkill -9 Arc
 #+end_src
 
+Next, let's kill Spotify if it's running. While admittedly this has nothing to
+do with security or confidentiality, it's a practical measure, as Spotify uses
+the Electron framework---essentially a headless browser invocation---which uses
+far to many system resources which I would like released.
+
+#+begin_src shell
+
+# Kill Spotify desktop app if running, releasing system resources
+pkill -9 Spotify
+#+end_src
